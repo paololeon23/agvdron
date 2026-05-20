@@ -3,6 +3,11 @@ dronAGV — Solo HTML, CSS y JavaScript
 
 Sin Node.js ni npm. Abre index.html directamente.
 
+Netlify (repo = carpeta nima):
+  Un solo netlify.toml en la raíz del repo (publish = dronAGV)
+  Build command → vacío
+  Un solo index.html → dronAGV/index.html
+
 Archivos:
   index.html  → doble clic para abrir
   styles.css  → diseño

@@ -1,0 +1,9 @@
+# dronAGV — sitio estático (sin build)
+[build]
+  publish = "dronAGV"
+  command = ""
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
