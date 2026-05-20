@@ -1,0 +1,222 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0a1628" />
+  <title>dronAGV</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page-field-bg" aria-hidden="true"></div>
+  <div class="page-gradient" aria-hidden="true"></div>
+
+  <div id="saveOverlay" class="save-overlay" aria-hidden="true" aria-live="polite">
+    <div class="save-overlay-bg" aria-hidden="true"></div>
+    <div class="save-overlay-inner">
+      <div class="ag-loader ag-loader-lg" aria-hidden="true">
+        <svg class="loader-ring" viewBox="0 0 120 120" width="120" height="120">
+          <defs>
+            <linearGradient id="ringGradSave" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#00bfa5" />
+              <stop offset="100%" stop-color="#8bc34a" />
+            </linearGradient>
+          </defs>
+          <circle class="ring-inner" cx="60" cy="60" r="46" />
+          <circle class="ring-track" cx="60" cy="60" r="52" />
+          <circle class="ring-progress" id="saveRingProgress" cx="60" cy="60" r="52" />
+        </svg>
+        <div class="loader-icon-wrap">
+          <svg class="loader-drone-icon" viewBox="0 0 64 64" aria-hidden="true">
+            <path d="M32 10v8M32 46v8M10 32h8M46 32h8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+            <rect x="20" y="26" width="24" height="12" rx="4" fill="rgba(255,255,255,0.08)" stroke="currentColor" stroke-width="2"/>
+            <ellipse cx="10" cy="32" rx="9" ry="3" fill="none" stroke="currentColor" stroke-width="2" class="spin-blade"/>
+            <ellipse cx="54" cy="32" rx="9" ry="3" fill="none" stroke="currentColor" stroke-width="2" class="spin-blade"/>
+            <ellipse cx="32" cy="10" rx="9" ry="3" fill="none" stroke="currentColor" stroke-width="2" class="spin-blade"/>
+            <ellipse cx="32" cy="54" rx="9" ry="3" fill="none" stroke="currentColor" stroke-width="2" class="spin-blade"/>
+            <circle cx="32" cy="32" r="4" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+      <p class="save-title" id="saveOverlayTitle">Guardando inspección</p>
+      <p class="save-sub" id="saveOverlaySub">Sincronizando telemetría…</p>
+    </div>
+  </div>
+
+  <div id="detailModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <header class="modal-header">
+        <div>
+          <p class="modal-label">Inspección registrada</p>
+          <h2 id="modalTitle" class="modal-title">—</h2>
+          <p id="modalSubtitle" class="modal-subtitle">—</p>
+        </div>
+        <button type="button" class="modal-close" data-close aria-label="Cerrar">&times;</button>
+      </header>
+      <div id="modalBody" class="modal-body"></div>
+      <footer class="modal-footer">
+        <button type="button" class="btn-modal danger" id="modalDelete">Eliminar</button>
+        <button type="button" class="btn-modal primary" data-close>Cerrar</button>
+      </footer>
+    </div>
+  </div>
+
+  <main class="app">
+    <header class="header">
+      <div class="header-badge"><span class="live-dot"></span><span>EN CAMPO</span></div>
+      <h1 class="logo"><span>dron</span>AGV</h1>
+      <p class="tagline">Telemetría · Controlador agrícola</p>
+      <div class="header-actions">
+        <button type="button" class="btn-chip" id="btnExport">Excel</button>
+        <button type="button" class="btn-chip danger" id="btnReset">Reiniciar</button>
+      </div>
+    </header>
+
+    <section class="stats-row">
+      <article class="stat glass"><span class="stat-val" id="totalHa">0,00</span><span class="stat-lbl">ha hoy</span></article>
+      <article class="stat glass"><span class="stat-val" id="totalL">0,0</span><span class="stat-lbl">L hoy</span></article>
+      <article class="stat glass"><span class="stat-val" id="flightCount">0</span><span class="stat-lbl">vuelos</span></article>
+    </section>
+    <p class="date-line" id="summaryDate">—</p>
+
+    <section class="status-strip glass" aria-label="Estado del vuelo">
+      <p class="status-rtk" id="heroRtk">RTK —</p>
+      <div class="status-chips">
+        <span class="status-chip" id="heroHa">— ha</span>
+        <span class="status-chip" id="heroL">— L</span>
+        <span class="status-chip" id="heroRoute">— m</span>
+      </div>
+    </section>
+
+    <section class="field-vision glass" aria-label="Marcación del terreno">
+      <div class="field-vision-bg" aria-hidden="true"></div>
+      <div class="field-hud field-hud-top">
+        <p class="field-hud-title" id="terrainViewTitle">Vista del campo</p>
+      </div>
+      <div class="terrain-scene" id="terrainScene">
+        <span class="terrain-measure measure-side measure-side-left" id="hudMeasureLateralLeft">— m</span>
+        <div class="terrain-map-wrap" id="terrainMapWrap">
+          <svg class="terrain-svg" viewBox="0 0 300 180" aria-label="Mapa del lote">
+            <defs>
+              <linearGradient id="terrainFill" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="rgba(56,189,248,0.22)" />
+                <stop offset="100%" stop-color="rgba(56,189,248,0.4)" />
+              </linearGradient>
+              <linearGradient id="beamGrad" x1="0.5" y1="0" x2="0.5" y2="1">
+                <stop offset="0%" stop-color="rgba(250,204,21,0.55)" />
+                <stop offset="40%" stop-color="rgba(56,189,248,0.35)" />
+                <stop offset="100%" stop-color="rgba(34,197,94,0.05)" />
+              </linearGradient>
+            </defs>
+            <polygon id="terrainPoly" class="terrain-poly" points="48,42 252,38 248,138 52,134" />
+            <g id="terrainPaths" class="terrain-paths"></g>
+            <polygon id="terrainGlow" class="terrain-glow" points="48,42 252,38 248,138 52,134" />
+            <g class="terrain-corners" aria-hidden="true">
+              <circle cx="48" cy="42" r="4" class="corner-dot"/>
+              <circle cx="252" cy="38" r="4" class="corner-dot"/>
+              <circle cx="248" cy="138" r="4" class="corner-dot"/>
+              <circle cx="52" cy="134" r="4" class="corner-dot"/>
+            </g>
+          </svg>
+          <div class="terrain-flight" id="terrainFlight" aria-hidden="true">
+            <div class="flight-unit" id="flightUnit">
+              <div class="flight-drone" id="flightDrone">
+                <svg class="flight-drone-svg" viewBox="0 0 64 64" aria-hidden="true">
+                <path d="M32 10v8M32 46v8M10 32h8M46 32h8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                <rect x="20" y="26" width="24" height="12" rx="4" fill="rgba(255,255,255,0.12)" stroke="currentColor" stroke-width="2"/>
+                <ellipse cx="10" cy="32" rx="9" ry="3" fill="none" stroke="currentColor" stroke-width="2" class="spin-blade"/>
+                <ellipse cx="54" cy="32" rx="9" ry="3" fill="none" stroke="currentColor" stroke-width="2" class="spin-blade"/>
+                <ellipse cx="32" cy="10" rx="9" ry="3" fill="none" stroke="currentColor" stroke-width="2" class="spin-blade"/>
+                <ellipse cx="32" cy="54" rx="9" ry="3" fill="none" stroke="currentColor" stroke-width="2" class="spin-blade"/>
+                <circle cx="32" cy="32" r="4" fill="currentColor"/>
+                </svg>
+              </div>
+              <div class="flight-beam" id="flightBeam" aria-hidden="true"></div>
+            </div>
+          </div>
+        </div>
+        <span class="terrain-measure measure-side measure-side-right" id="hudMeasureLateral">— m</span>
+        <span class="terrain-measure measure-route measure-bottom" id="hudMeasureRouteBottom">— m</span>
+      </div>
+      <div class="field-hud">
+        <div class="hud-pill"><span class="hud-k">Ruta</span><span class="hud-v" id="hudRoute">— m</span></div>
+        <div class="hud-pill"><span class="hud-k">Lateral</span><span class="hud-v" id="hudLateral">— m</span></div>
+        <div class="hud-pill hud-pill-accent"><span class="hud-k">Área</span><span class="hud-v" id="hudHa">— ha</span></div>
+      </div>
+    </section>
+
+    <form id="inspectForm" class="form glass" autocomplete="off">
+      <h2 class="form-title">Registrar telemetría</h2>
+      <p class="form-hint">Copia los valores de la pantalla del controlador</p>
+
+      <div class="inp-card inp-card-full">
+        <label for="inpRtk">Equipo / RTK</label>
+        <input id="inpRtk" type="text" class="inp" placeholder="RTK 31" />
+      </div>
+
+      <div class="form-grid">
+        <div class="inp-card">
+          <label for="inpHectares">Área operada</label>
+          <div class="inp-unit-wrap"><input id="inpHectares" type="text" inputmode="decimal" class="inp" placeholder="9,88" /><span class="u">ha</span></div>
+        </div>
+        <div class="inp-card">
+          <label for="inpLiters">Líquido aplicado</label>
+          <div class="inp-unit-wrap"><input id="inpLiters" type="text" inputmode="decimal" class="inp" placeholder="494,1" /><span class="u">L</span></div>
+        </div>
+        <div class="inp-card">
+          <label for="inpAltitude">Altitud</label>
+          <div class="inp-unit-wrap"><input id="inpAltitude" type="text" inputmode="decimal" class="inp" placeholder="4,7" /><span class="u">m</span></div>
+        </div>
+        <div class="inp-card">
+          <label for="inpFlowRate">Tasa de flujo</label>
+          <div class="inp-unit-wrap"><input id="inpFlowRate" type="text" inputmode="decimal" class="inp" placeholder="10,81" /><span class="u">L/min</span></div>
+        </div>
+        <div class="inp-card">
+          <label for="inpSpeed">Velocidad</label>
+          <div class="inp-unit-wrap"><input id="inpSpeed" type="text" inputmode="decimal" class="inp" placeholder="4,9" /><span class="u">m/s</span></div>
+        </div>
+        <div class="inp-card">
+          <label for="inpDistance">Distancia</label>
+          <div class="inp-unit-wrap"><input id="inpDistance" type="text" inputmode="decimal" class="inp" placeholder="377" /><span class="u">m</span></div>
+        </div>
+      </div>
+
+      <div class="inp-zone">
+        <p class="zone-title">Terreno / ruta</p>
+        <div class="inp-card">
+          <label for="inpRouteMeters">Medida visible terreno/ruta</label>
+          <div class="inp-unit-wrap"><input id="inpRouteMeters" type="text" inputmode="decimal" class="inp" placeholder="723,6" /><span class="u">m</span></div>
+        </div>
+        <div class="inp-card">
+          <label for="inpLateralMeters">Valor lateral</label>
+          <div class="inp-unit-wrap"><input id="inpLateralMeters" type="text" inputmode="decimal" class="inp" placeholder="219" /><span class="u">m</span></div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-main">Guardar inspección</button>
+      <button type="button" class="btn-ghost-full" id="btnClear">Limpiar campos</button>
+    </form>
+
+    <section class="records-section">
+      <h2 class="section-title">Inspecciones de hoy</h2>
+      <p id="recordsEmpty" class="records-empty">Aún no hay inspecciones.<br />Guarda la primera arriba.</p>
+      <div id="recordsList" class="records-list"></div>
+      <nav id="recordsPagination" class="records-pagination" aria-label="Paginación de inspecciones" hidden>
+        <button type="button" class="page-btn page-prev" id="recordsPagePrev" aria-label="Página anterior">‹</button>
+        <div class="page-nums" id="recordsPageNums"></div>
+        <button type="button" class="page-btn page-next" id="recordsPageNext" aria-label="Página siguiente">›</button>
+      </nav>
+      <p id="recordsPageInfo" class="records-page-info" hidden></p>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
