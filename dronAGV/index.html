@@ -4,13 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#0a1628" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="dronAGV" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/icon.svg" />
   <title>dronAGV</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div id="networkBanner" class="network-banner" hidden role="status" aria-live="polite">
+    <span class="network-banner-ico" aria-hidden="true">📡</span>
+    <span id="networkBannerText">Sin conexión — modo local activo</span>
+  </div>
   <div class="page-field-bg" aria-hidden="true"></div>
   <div class="page-gradient" aria-hidden="true"></div>
 
@@ -46,6 +54,44 @@
     </div>
   </div>
 
+  <div id="pdfModal" class="modal pdf-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="pdfModalTitle">
+    <div class="modal-backdrop" data-pdf-close></div>
+    <div class="modal-sheet pdf-sheet">
+      <div class="modal-handle"></div>
+      <header class="modal-header">
+        <div>
+          <p class="modal-label">Vista PDF</p>
+          <h2 id="pdfModalTitle" class="modal-title">—</h2>
+          <p id="pdfModalSubtitle" class="modal-subtitle">Informe de inspección</p>
+        </div>
+        <button type="button" class="modal-close" data-pdf-close aria-label="Cerrar">&times;</button>
+      </header>
+      <div class="pdf-preview-wrap">
+        <div class="pdf-viewer-toolbar" aria-label="Controles del visor PDF">
+          <span class="pdf-toolbar-spacer" aria-hidden="true"></span>
+          <div class="pdf-zoom-controls">
+            <button type="button" class="pdf-zoom-btn" id="pdfZoomOut" aria-label="Alejar">−</button>
+            <span class="pdf-page-info" id="pdfPageInfo">1 de 1</span>
+            <button type="button" class="pdf-zoom-btn" id="pdfZoomIn" aria-label="Acercar">+</button>
+          </div>
+          <button type="button" class="pdf-fit-btn" id="pdfZoomFit" aria-label="Ver hoja completa">⤢</button>
+        </div>
+        <div class="pdf-canvas-scroller" id="pdfCanvasScroller">
+          <canvas id="pdfCanvas" class="pdf-canvas" aria-label="Vista previa del PDF"></canvas>
+        </div>
+      </div>
+      <footer class="pdf-modal-footer">
+        <button type="button" class="btn-pdf-action btn-pdf-download" id="pdfBtnDownload">
+          <span class="btn-pdf-ico" aria-hidden="true">↓</span> Descargar PDF
+        </button>
+        <button type="button" class="btn-pdf-action btn-pdf-wa" id="pdfBtnWhatsApp">
+          <span class="btn-pdf-ico" aria-hidden="true">W</span> Enviar PDF
+        </button>
+        <button type="button" class="btn-pdf-action btn-pdf-cancel" data-pdf-close>Cancelar</button>
+      </footer>
+    </div>
+  </div>
+
   <div id="detailModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-backdrop" data-close></div>
     <div class="modal-sheet">
@@ -68,7 +114,13 @@
 
   <main class="app">
     <header class="header">
-      <div class="header-badge"><span class="live-dot"></span><span>EN CAMPO</span></div>
+      <div class="header-badges">
+        <div class="header-badge"><span class="live-dot"></span><span>EN CAMPO</span></div>
+        <div id="networkStatus" class="network-pill is-online" title="Estado de conexión">
+          <span class="network-pill-dot" id="networkStatusDot" aria-hidden="true"></span>
+          <span id="networkStatusLabel">EN LÍNEA</span>
+        </div>
+      </div>
       <h1 class="logo"><span>dron</span>AGV</h1>
       <p class="tagline">Telemetría · Controlador agrícola</p>
       <div class="header-actions">
@@ -104,12 +156,12 @@
           <svg class="terrain-svg" viewBox="0 0 300 180" aria-label="Mapa del lote">
             <defs>
               <linearGradient id="terrainFill" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="rgba(56,189,248,0.22)" />
-                <stop offset="100%" stop-color="rgba(56,189,248,0.4)" />
+                <stop offset="0%" stop-color="rgba(74,222,128,0.18)" />
+                <stop offset="100%" stop-color="rgba(34,197,94,0.32)" />
               </linearGradient>
               <linearGradient id="beamGrad" x1="0.5" y1="0" x2="0.5" y2="1">
                 <stop offset="0%" stop-color="rgba(250,204,21,0.55)" />
-                <stop offset="40%" stop-color="rgba(56,189,248,0.35)" />
+                <stop offset="45%" stop-color="rgba(134,239,172,0.35)" />
                 <stop offset="100%" stop-color="rgba(34,197,94,0.05)" />
               </linearGradient>
             </defs>
@@ -215,8 +267,12 @@
     </section>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
-  <script src="app.js"></script>
+  <script src="vendor/sweetalert2.all.min.js"></script>
+  <script src="vendor/xlsx.bundle.js"></script>
+  <script src="vendor/jspdf.umd.min.js"></script>
+  <script src="vendor/pdf.min.js"></script>
+  <script src="network.js"></script>
+  <script src="sounds.js"></script>
+  <script src="app.js" defer></script>
 </body>
 </html>

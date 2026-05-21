@@ -1,24 +1,22 @@
-dronAGV — Solo HTML, CSS y JavaScript
-=====================================
+dronAGV — Solo HTML, CSS y JavaScript (100% offline)
+====================================================
 
-Sin Node.js ni npm. Abre index.html directamente.
+Sin Node.js ni npm. Abre index.html con un servidor local o Netlify.
 
-Netlify (repo = carpeta nima):
-  Un solo netlify.toml en la raíz del repo (publish = dronAGV)
-  Build command → vacío
-  Un solo index.html → dronAGV/index.html
+Librerias locales (carpeta vendor/):
+  - sweetalert2.all.min.js
+  - xlsx.bundle.js
+  - jspdf.umd.min.js
+  - pdf.min.js, pdf.worker.min.js (vista previa a hoja completa)
 
-Archivos:
-  index.html  → doble clic para abrir
-  styles.css  → diseño
-  app.js      → lógica
-  assets/     → imagen de fondo (opcional)
+No requiere internet despues de desplegar o abrir una vez con servidor.
 
-Uso:
-1. Abre index.html en Chrome o Edge
-2. Llena los valores del controlador
-3. Guardar inspección → animación del dron + barra de progreso
-4. Inspecciones de hoy (10 por página) → toca una tarjeta para ver detalle
-5. Botón Excel → descarga .xlsx con todas las columnas del formulario (requiere internet)
+Netlify: netlify.toml en la raiz (publish = dronAGV)
 
-Los datos se guardan en este navegador (localStorage).
+Probar en local:
+  npx --yes serve dronAGV
+  Abre http://localhost:3000
+
+Instalar en movil: Chrome -> Instalar aplicacion / Anadir a inicio
+
+Datos: localStorage en el dispositivo.

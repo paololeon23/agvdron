@@ -8,12 +8,11 @@
   --border-glow: rgba(74, 222, 128, 0.35);
   --text: #f4f7fb;
   --muted: #94a3b8;
-  --cyan: #38bdf8;
   --green: #22c55e;
   --green-bright: #86efac;
-  --accent: #2dd4bf;
+  --accent: #4ade80;
   --radius: 1.1rem;
-  --font: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --field-bg: url("assets/field-bg.jpg");
 }
 
@@ -71,6 +70,14 @@ body {
 
 /* Header */
 .header { text-align: center; margin-bottom: 1rem; }
+.header-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
 .header-badge {
   display: inline-flex;
   align-items: center;
@@ -83,7 +90,69 @@ body {
   color: var(--green-bright);
   border: 1px solid var(--border-glow);
   background: rgba(34, 197, 94, 0.08);
-  margin-bottom: 0.5rem;
+}
+.network-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(30, 41, 59, 0.5);
+  color: var(--muted);
+  transition: border-color 0.25s, color 0.25s, background 0.25s;
+}
+.network-pill.is-online {
+  color: #86efac;
+  border-color: rgba(74, 222, 128, 0.35);
+  background: rgba(34, 197, 94, 0.1);
+}
+.network-pill.is-offline {
+  color: #fcd34d;
+  border-color: rgba(251, 191, 36, 0.4);
+  background: rgba(120, 53, 15, 0.25);
+}
+.network-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 6px currentColor;
+}
+.network-pill.is-online .network-pill-dot {
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+.network-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: center;
+  color: #fef3c7;
+  background: linear-gradient(180deg, rgba(120, 53, 15, 0.95), rgba(69, 26, 3, 0.92));
+  border-bottom: 1px solid rgba(251, 191, 36, 0.35);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+.network-banner[hidden] {
+  display: none !important;
+}
+.network-banner-ico {
+  flex-shrink: 0;
+  font-size: 0.9rem;
+}
+body.has-offline-banner {
+  padding-top: 2.35rem;
 }
 .live-dot {
   width: 6px;
@@ -257,7 +326,7 @@ body {
   font-weight: 700;
   color: var(--text);
   background: rgba(0, 0, 0, 0.28);
-  border: 1px solid rgba(56, 189, 248, 0.25);
+  border: 1px solid rgba(134, 239, 172, 0.25);
   font-variant-numeric: tabular-nums;
 }
 
@@ -321,9 +390,9 @@ body {
 }
 .terrain-poly {
   fill: url(#terrainFill);
-  stroke: rgba(56, 189, 248, 0.4);
+  stroke: rgba(134, 239, 172, 0.4);
   stroke-width: 2.5;
-  filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.45));
+  filter: drop-shadow(0 0 10px rgba(134, 239, 172, 0.45));
   transition: points 0.45s ease;
 }
 .terrain-glow {
@@ -334,13 +403,14 @@ body {
 }
 .terrain-paths .path-line {
   fill: none;
-  stroke: rgba(56, 189, 248, 0.4);
-  stroke-width: 1.5;
+  stroke: rgba(134, 239, 172, 0.55);
+  stroke-width: 1;
   stroke-linecap: round;
+  stroke-dasharray: 12 6;
 }
 .corner-dot {
   fill: #fff;
-  stroke: rgba(56, 189, 248, 0.4);
+  stroke: rgba(134, 239, 172, 0.4);
   stroke-width: 2;
 }
 .terrain-flight {
@@ -381,7 +451,7 @@ body {
   background: linear-gradient(
     180deg,
     rgba(254, 240, 138, 0.75) 0%,
-    rgba(56, 189, 248, 0.5) 30%,
+    rgba(134, 239, 172, 0.5) 30%,
     rgba(34, 197, 94, 0.25) 55%,
     transparent 85%
   );
@@ -489,7 +559,7 @@ body {
   border-radius: 10px;
 }
 .hud-pill-accent {
-  box-shadow: inset 0 0 16px rgba(56, 189, 248, 0.08);
+  box-shadow: inset 0 0 16px rgba(134, 239, 172, 0.08);
 }
 .hud-k {
   font-size: 0.48rem;
@@ -539,9 +609,9 @@ body {
   transition: border-color 0.2s, background 0.2s;
 }
 .inp-card:focus-within {
-  border-color: rgba(45, 212, 191, 0.45);
+  border-color: rgba(74, 222, 128, 0.45);
   background: rgba(0, 0, 0, 0.32);
-  box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.15);
+  box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.15);
 }
 .inp-card-full {
   margin-bottom: 0.55rem;
@@ -550,8 +620,8 @@ body {
   padding: 0.9rem;
   margin-bottom: 1rem;
   border-radius: 0.9rem;
-  border: 1px solid rgba(56, 189, 248, 0.2);
-  background: rgba(56, 189, 248, 0.06);
+  border: 1px solid rgba(134, 239, 172, 0.2);
+  background: rgba(134, 239, 172, 0.06);
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
@@ -562,7 +632,7 @@ body {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--cyan);
+  color: var(--green-bright);
   margin: 0 0 0.15rem;
 }
 label {
@@ -814,16 +884,15 @@ label {
 .inspect-chip {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.55rem;
   width: 100%;
-  padding: 0.8rem 0.9rem;
+  padding: 0.8rem 0.75rem 0.8rem 0.9rem;
   text-align: left;
   border: 1px solid var(--border);
   border-radius: 0.9rem;
   background: var(--glass);
   backdrop-filter: blur(16px);
   font-family: inherit;
-  cursor: pointer;
   transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
   animation: chip-in 0.45s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
@@ -831,11 +900,30 @@ label {
   from { opacity: 0; transform: translateY(12px) scale(0.96); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
-.inspect-chip:hover,
-.inspect-chip:focus {
-  outline: none;
+.inspect-chip:hover {
   border-color: var(--border-glow);
   box-shadow: 0 4px 24px rgba(34, 197, 94, 0.15);
+}
+.inspect-chip-open {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+}
+.inspect-chip-open:hover,
+.inspect-chip-open:focus {
+  outline: none;
+}
+.inspect-chip:hover .inspect-chip-open {
   transform: translateY(-1px);
 }
 .chip-icon {
@@ -844,7 +932,7 @@ label {
   height: 40px;
   border-radius: 999px;
   background: linear-gradient(180deg, var(--accent), var(--green));
-  box-shadow: 0 0 12px rgba(45, 212, 191, 0.4);
+  box-shadow: 0 0 12px rgba(74, 222, 128, 0.35);
 }
 .chip-body { flex: 1; min-width: 0; }
 .chip-title {
@@ -867,6 +955,36 @@ label {
 .chip-arrow {
   color: var(--muted);
   font-size: 1rem;
+  flex-shrink: 0;
+}
+.chip-pdf-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.55rem;
+  height: 2.55rem;
+  padding: 0.3rem 0.38rem;
+  border: 1px solid rgba(248, 113, 113, 0.45);
+  border-radius: 0.65rem;
+  background: linear-gradient(145deg, rgba(248, 113, 113, 0.18), rgba(12, 20, 32, 0.95));
+  color: #fca5a5;
+  font-family: inherit;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(248, 113, 113, 0.2);
+  transition: transform 0.15s, border-color 0.2s, box-shadow 0.2s;
+}
+.chip-pdf-btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(252, 165, 165, 0.75);
+  box-shadow: 0 4px 18px rgba(248, 113, 113, 0.35);
+}
+.chip-pdf-btn:active {
+  transform: translateY(0);
 }
 
 /* Modal */
@@ -981,7 +1099,7 @@ label {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--cyan);
+  color: var(--green-bright);
   margin: 0.75rem 0 0.35rem;
 }
 .modal-footer {
@@ -1007,6 +1125,142 @@ label {
   background: rgba(248, 113, 113, 0.15);
   color: #f87171;
   border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+/* Modal PDF */
+.pdf-modal {
+  z-index: 310;
+}
+.pdf-sheet {
+  display: flex;
+  flex-direction: column;
+  max-height: min(92dvh, 720px);
+  min-height: 70dvh;
+  width: 100%;
+  max-width: 26rem;
+}
+.pdf-preview-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 0 0.65rem;
+  border-radius: 0.55rem;
+  overflow: hidden;
+  background: #525659;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+.pdf-viewer-toolbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.55rem;
+  background: #f1f5f9;
+  border-bottom: 1px solid #cbd5e1;
+}
+.pdf-toolbar-spacer {
+  flex: 1;
+}
+.pdf-zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.pdf-zoom-btn,
+.pdf-fit-btn {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.35rem;
+  background: #fff;
+  color: #334155;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  font-family: inherit;
+}
+.pdf-fit-btn {
+  font-size: 0.95rem;
+}
+.pdf-zoom-btn:active,
+.pdf-fit-btn:active {
+  background: #e2e8f0;
+}
+.pdf-page-info {
+  min-width: 3.5rem;
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #475569;
+  font-variant-numeric: tabular-nums;
+}
+.pdf-canvas-scroller {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem;
+  background: #525659;
+}
+.pdf-canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  background: #fff;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.35);
+  border-radius: 2px;
+}
+.pdf-modal-footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+  padding: 0.75rem 1rem 1.25rem;
+  border-top: 1px solid var(--border);
+}
+.btn-pdf-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.72rem 0.5rem;
+  border-radius: 0.7rem;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+.btn-pdf-action:active {
+  transform: scale(0.98);
+}
+.btn-pdf-download {
+  grid-column: 1;
+  background: linear-gradient(135deg, #86efac, #22c55e);
+  color: #052e16;
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3);
+}
+.btn-pdf-wa {
+  grid-column: 2;
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(37, 211, 102, 0.25);
+}
+.btn-pdf-cancel {
+  grid-column: 1 / -1;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+.btn-pdf-ico {
+  font-size: 0.85rem;
+  font-weight: 800;
 }
 
 @media (min-width: 480px) {
